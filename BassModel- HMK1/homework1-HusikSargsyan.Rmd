@@ -1,0 +1,107 @@
+---
+title: "Homework1_HusikSargsyan"
+author: "Husik Sargsyan"
+date: "2024-10-18"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+#Humane Ai Pin
+
+The choosen product for this homework is Humane Ai Pin (https://time.com/collection/best-inventions-2023/6327143/humane-ai-pin/). The Humane Ai Pin attaches to your clothing, it becomes your AI-powered personal assistant. Using a mix of proprietary software and OpenAI’s GPT, the device lets you do everything from ask complex questions to make calls and send texts, all using just your voice.
+
+
+#Similar Innovation
+
+Similar to Humane AI Pin, Google Glass represented an early attempt to blend AI with clothes and acccessories. Google Glass allows users to interact with specific apps and receive notifications or information directly through a small display on their glasses. The product suffered greatly, though, due to significant challenges, including privacy and the discomfort of its conspicuous style and ineptitude. Yet, this was exactly what Google Glass was designed to achieve: Aiming to demonstrate an artificial intelligence integration into the working pace of the user's life, even in the face of such evident limitations.
+On the other hand, Humane AI Pin took into consideration all the disadvantages that Google Glass experiments had. The innovation replaced the screen visibility and instead implemented direct voice, gesture, and sound interactions. 
+
+For the homework I will be using the following data, which represents the annual sales in millions for Google Glass. Reference Link: https://www.statista.com/chart/1143/forecast-of-annual-google-glass-sales/
+
+
+```{r}
+library(ggplot2)
+
+data <- data.frame(years = c(2014, 2015, 2016, 2017, 2018),
+                   sales = c(0.8, 2.5, 3.7, 10.6, 21.1))
+
+ggplot(data = data, aes(x = years, y = sales)) +
+  geom_bar(stat = 'identity', fill = 'skyblue') +
+  geom_text(aes(label = sales), vjust = -0.5) +  
+  ggtitle("Google Glasses' sales per years") +
+  xlab("Years") +
+  ylab("Sales in millions") +
+  theme_classic()
+
+
+```
+
+```{r}
+sales <- c(0.8, 2.5, 3.7, 10.6, 21.1)
+t = 1:length(sales)
+start_values = list(m = sum(sales), p = 0.01, q = 0.3)
+
+bass_model = nls(sales ~ m*(((p+q)^2/p)*exp(-(p+q)*t)) /
+               (1 + (q/p)*exp(-(p+q)*t))^2,
+             start = start_values,
+             algorithm = "port",
+             control = nls.control(maxiter = 200, warnOnly = TRUE))
+summary(bass_model)
+
+```
+
+```{r}
+p = coef(bass_model)["p"]
+q = coef(bass_model)["q"]
+m = coef(bass_model)["m"]
+
+cat("Estimated p (innovation):", round(p, 4), "\n")
+cat("Estimated q (imitation):", round(q, 4), "\n")
+cat("Estimated M (market potential):", round(m, 4), "\n")
+
+```
+
+```{r}
+p <- 0.0018
+q <- 0.9426
+m <- 152.3434
+
+bass_prediction <- function(t, m, p, q) {
+  m * (((p + q)^2 / p) * exp(-(p + q) * t)) / (1 + (q / p) * exp(-(p + q) * t))^2
+}
+
+first_year <- 2024
+
+num_years <- 5
+predicted_adopters <- sapply(first_year:(first_year + num_years - 1), 
+                             function(year) bass_prediction(year - first_year, m, p, q))
+print(predicted_adopters)
+```
+
+
+Now let's take the market potential for Google glasses equal to 250, to see the difference it would make. 
+
+```{r}
+p <- 0.0018
+q <- 0.9426
+m <- 250
+
+bass_prediction <- function(t, m, p, q) {
+  m * (((p + q)^2 / p) * exp(-(p + q) * t)) / (1 + (q / p) * exp(-(p + q) * t))^2
+}
+
+first_year <- 2024
+
+num_years <- 5
+predicted_adopters <- sapply(first_year:(first_year + num_years - 1), 
+                             function(year) bass_prediction(year - first_year, m, p, q))
+print(predicted_adopters)
+
+```
+
+As we can see the results are almost twice higher in this case. 
+
+
+
+
